@@ -17,7 +17,7 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@4.1.1
         with:
-          ssh-key: ${{ secrets.ACCESS_TOKEN }}
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
           repository-name: dochoncho/mirror-mirror.github.io
           branch: master
           folder: dist
