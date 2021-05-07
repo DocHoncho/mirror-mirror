@@ -7,7 +7,7 @@
 		>
 			<div class="d-flex align-center">
 				<div class="app-title">
-					<span>MIR</span><span class="mflip">R</span><span class="mflip">I</span><span class="mflip">M</span> <span class="mflip">R</span><span class="mflip">O</span><span class="mflip">R</span><span>ROR</span>
+					<span>MIR</span><span class="mflip">R</span><span class="mflip">I</span><span class="mflip">M</span>&nbsp;<span class="mflip">R</span><span class="mflip">O</span><span class="mflip">R</span><span>ROR</span>
 				</div>
 			</div>
 
