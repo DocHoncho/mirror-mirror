@@ -6,29 +6,59 @@
 		</v-row>
 		<v-row>
 			<v-col>
-				<canvas style="border:1px solid grey;"
-								id="srcImgCanvas"
-								width="300"
-								height="300"
-								ref="srcImgCanvas"
-				></canvas>
+				<div class="viewport"
+						 ref="srcView"
+				>
+					<canvas style="border:1px solid grey;"
+									id="srcImgCanvas"
+									width="300"
+									height="300"
+									ref="srcImgCanvas"
+					></canvas>
+				</div>
 				<v-slider
-						v-model="srcImgTranslate"
-						thumb-label="always"
+						v-model="srcImg.translate"
+						label="Shift"
 						:min="srcImgMin"
 						:max="srcImgMax"
-				/>
+						v-on:input="updateSrcImg"
+				>
+					<template v-slot:append>
+						<v-text-field
+								v-model="srcImg.translate"
+								class="mt-0 pt-0"
+								hide-details
+								single-line
+								type="number"
+								style="width:60px"
+								v-on:input="updateSrcImg"
+						></v-text-field>
+					</template>
+				</v-slider>
 				<v-slider
-						v-model="srcImgRotate"
-						thumb-label="always"
-						min="-360"
-						max="360"
-				/>
+						v-model="srcImg.rotation"
+						label="Rotation"
+						min="-180"
+						max="180"
+						v-on:input="updateSrcImg"
+				>
+					<template v-slot:append>
+						<v-text-field
+								v-model="srcImg.rotation"
+								class="mt-0 pt-0"
+								hide-details
+								single-line
+								type="number"
+								style="width:60px"
+								v-on:input="updateSrcImg"
+						></v-text-field>
+					</template>
+				</v-slider>
+				<v-color-picker
+						v-model="srcImg.bgColor"
+						v-on:input="updateSrcImg"
+				></v-color-picker>
 			</v-col>
-			<v-col>
-			</v-col>
-		</v-row>
-		<v-row>
 			<v-col>
 				<canvas style="border:1px solid grey;"
 								id="destImgCanvas"
@@ -36,6 +66,11 @@
 								height="300"
 								ref="destImgCanvas"
 				></canvas>
+			</v-col>
+		</v-row>
+		<v-row>
+			<v-col>
+
 			</v-col>
 		</v-row>
 	</v-container>
@@ -82,21 +117,18 @@ export default {
 	},
 	data () {
 		return {
-			srcImg: null,
-			srcImgUrl: '',
-			srcImgTranslate: 0,
-			srcImgRotate: 0,
+			srcImg: {
+				url: '',
+				width: 0,
+				height: 0,
+				translate: 0,
+				rotation: 0,
+				bgColor: 'white',
+			},
 			destImg: null,
 		};
 	},
-	watch: {
-		srcImgTranslate () {
-			this.updateSrcImg();
-		},
-		srcImgRotate () {
-			this.updateSrcImg();
-		},
-	},
+	watch: {},
 	methods: {
 		handlePaste (event) {
 			if (event.clipboardData) {
@@ -108,10 +140,19 @@ export default {
 				for (let i = 0; i < items.length; i++) {
 					if (items[ i ].type.indexOf('image') !== -1) {
 						//image
-						let blob = items[ i ].getAsFile();
-						let URLObj = window.URL || window.webkitURL;
-						this.srcImgUrl = URLObj.createObjectURL(blob);
-						this.updateSrcImg();
+						// let blob = items[ i ].getAsFile();
+						createImageBitmap(items[ i ].getAsFile()).then((bmp) => {
+							this.srcImg.bitmap = bmp;
+							this.srcImg.width = bmp.width;
+							this.srcImg.height= bmp.height;
+							this.srcImg.rotation = 0;
+							this.srcImg.translate = 0;
+
+							this.updateSrcImg();
+						});
+						// let URLObj = window.URL || window.webkitURL;
+						// this.srcImgUrl = URLObj.createObjectURL(blob);
+						// this.updateSrcImg();
 						// this.paste_createImage(source);
 						is_image = true;
 					}
@@ -122,37 +163,101 @@ export default {
 			}
 		},
 		updateSrcImg () {
-			this.srcImg = new Image();
-			this.srcImg.onload = () => {
-				//this.srcImgCtx.clearRect(0, 0, this.srcImgCanvas.width, this.srcImgCanvas.height);
-				this.srcImgCanvas.width = this.srcImg.width;
-				this.srcImgCanvas.height = this.srcImg.height;
+			if (this.srcImg.bitmap) {
+				this.srcImg.width = this.srcImg.bitmap.width - Math.abs(this.srcImg.translate);
+				this.srcImg.height = this.srcImg.bitmap.height;
 
-				let cw = this.srcImgCanvas.width,
-						ch = this.srcImgCanvas.height;
-				let ctx = this.srcImgCtx;
+				const canvas = this.srcImgCanvas,
+						ctx = this.srcImgCtx,
+						cw = this.srcImg.width,
+						ch = this.srcImg.height;
+
+				canvas.width = cw;
+				canvas.height = ch;
+
+				ctx.fillStyle = this.srcImg.bgColor;
+				ctx.fillRect(0, 0, cw, ch);
 
 				ctx.save();
-				ctx.translate(cw/2, ch/2);
+				ctx.translate(cw / 2, ch / 2); // Center canvas for rotation
+				ctx.rotate(this.srcImg.rotation * Math.PI / 180);
 
-				ctx.translate(this.srcImgTranslate, 0);
-				ctx.rotate(this.srcImgRotate * Math.PI / 180);
-				ctx.drawImage(this.srcImg, -cw/2, -ch/2);
+				// ctx.translate(this.srcImg.translate, 0);
+				let sx = this.srcImg.translate < 0 ? -this.srcImg.translate : 0,
+						sw = cw;
+
+				ctx.drawImage(this.srcImg.bitmap, sx, 0, sw, ch, -cw / 2, -ch / 2, cw, ch);
 				ctx.restore();
 
+				// Draw dest left, normal orientation
+				let dctx = this.destImgCtx,
+						dcanv = this.destImgCanvas;
+				dcanv.width = this.srcImgCanvas.width*2
+				dcanv.height = this.srcImgCanvas.height;
+
+				dctx.drawImage(this.srcImgCanvas, 0, 0, cw/2, ch, 0, 0, cw/2, ch);
+				dctx.drawImage(this.srcImgCanvas, cw/2, 0, cw/2, ch, cw*1.5, 0, cw/2, ch);
+
+				dctx.save();
+				dctx.translate(cw, 0);
+				dctx.scale(-1, 1);
+				dctx.drawImage(this.srcImgCanvas, 0,    0, cw/2, ch, 0,      0, cw/2, ch);
+				dctx.drawImage(this.srcImgCanvas, cw/2, 0, cw/2, ch, -cw/2,    0,    cw/2, ch);
+				dctx.restore();
+
+				//let ctx2 = this.$refs.srcImgCanvas2.getContext('2d');
+				ctx.strokeStyle = 'green';
+				ctx.lineWidth = '3';
 				ctx.beginPath();
+				ctx.setLineDash([10, 10]);
 				ctx.moveTo(cw / 2, 0);
 				ctx.lineTo(cw / 2, ch);
 				ctx.stroke();
-			};
-			this.srcImg.src = this.srcImgUrl;
+			}
+			// let img = new Image();
+			// img.onload = () => {
+			// 	this.srcImg.width = img.width;
+			// 	this.srcImg.height = img.height;
+			//
+			// 	const cw = this.srcImg.width,
+			// 			ch = this.srcImg.height;
+			// 	let ctx = this.srcImgCtx;
+			//
+			// 	this.srcImgCanvas.width = cw;
+			// 	this.srcImgCanvas.height = ch;
+			// 	this.$refs.srcImgCanvas2.width = cw;
+			// 	this.$refs.srcImgCanvas2.height = ch;
+			//
+			// 	this.srcImgCtx.fillStyle = this.srcImg.bgColor;
+			// 	this.srcImgCtx.fillRect(0, 0, cw, ch);
+			//
+			// 	ctx.save();
+			// 	ctx.translate(cw / 2, ch / 2); // Center canvas for rotation
+			// 	ctx.rotate(this.srcImg.rotation * Math.PI / 180);
+			//
+			// 	ctx.translate(this.srcImg.translate, 0);
+			// 	ctx.drawImage(img, -cw / 2, -ch / 2);
+			// 	ctx.restore();
+			//
+			// 	let ctx2 = this.$refs.srcImgCanvas2.getContext('2d');
+			// 	ctx2.strokeStyle = 'green';
+			// 	ctx2.lineWidth = '3';
+			// 	ctx2.beginPath();
+			// 	ctx2.setLineDash([10, 10]);
+			// 	ctx2.moveTo(cw / 2, 0);
+			// 	ctx2.lineTo(cw / 2, ch);
+			// 	ctx2.stroke();
+			// };
+			// img.src = this.srcImg.url;
 		},
-		updateDestImg () {},
+		updateDestImg () {
+
+		},
 	},
 	mounted () {
 		let _self = this;
 		document.addEventListener('paste', function (e) { _self.handlePaste(e); }, false);
-		this.srcImgUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Max_Hardcore_2015.jpg/800px-Max_Hardcore_2015.jpg';
+		this.srcImg.url = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Max_Hardcore_2015.jpg/800px-Max_Hardcore_2015.jpg';
 		this.updateSrcImg();
 		// const clipboard = new CLIPBOARD_CLASS('srcImgCanvas', true);
 		// console.log(clipboard);
@@ -161,7 +266,9 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style scoped
+			 lang=scss
+>
 h3 {
 	margin: 40px 0 0;
 }
@@ -180,8 +287,24 @@ a {
 	color: #42b983;
 }
 
-#srcImgCanvas {
-	max-width: 500px;
-	max-height: 500px;
+#srcImg {
+	max-width: 250px;
+}
+
+.viewport {
+	position: relative;
+
+	canvas {
+		//position: absolute;
+	}
+}
+
+#srcImgCanvas, #srcImgCanvas2 {
+
+	max-height: 300px;
+	/*display:none;*/
+}
+#destImgCanvas {
+	max-height: 300px;
 }
 </style>
