@@ -48,72 +48,7 @@
  * @param {string} canvas_id - canvas id
  * @param {boolean} autoresize - if canvas will be resized
  */
-/*
-function CLIPBOARD_CLASS (canvas_id, autoresize) {
-	var _self = this;
-	var canvas = document.getElementById(canvas_id);
-	console.log(canvas);
-	var ctx = document.getElementById(canvas_id).getContext('2d');
-	//handlers
-	document.addEventListener('paste', function (e) { _self.paste_auto(e); }, false);
 
-	//on paste
-	this.paste_auto = function (e) {
-		if (e.clipboardData) {
-			var items = e.clipboardData.items;
-			if (!items) return;
-
-			//access data directly
-			var is_image = false;
-			for (var i = 0; i < items.length; i++) {
-				if (items[ i ].type.indexOf('image') !== -1) {
-					//image
-					var blob = items[ i ].getAsFile();
-					var URLObj = window.URL || window.webkitURL;
-					var source = URLObj.createObjectURL(blob);
-					this.paste_createImage(source);
-					is_image = true;
-				}
-			}
-			if (is_image == true) {
-				e.preventDefault();
-			}
-		}
-	};
-	//draw pasted image to canvas
-	this.paste_createImage = function (source) {
-		var pastedImage = new Image();
-		pastedImage.onload = function () {
-			if (autoresize == true) {
-				//resize
-				canvas.width = pastedImage.width * 2;
-				canvas.height = pastedImage.height;
-			} else {
-				//clear canvas
-				ctx.clearRect(0, 0, canvas.width, canvas.height);
-			}
-			ctx.drawImage(pastedImage, 0, 0);
-			ctx.drawImage(pastedImage, pastedImage.width, 0);
-			let iw = pastedImage.width;
-			let ih = pastedImage.height;
-
-			ctx.save();
-			ctx.translate(iw, 0);
-			ctx.scale(-1, 1);
-			ctx.drawImage(pastedImage, 0, 0, iw / 2, ih, 0, 0, iw / 2, ih);
-			ctx.restore();
-
-			ctx.save();
-			ctx.translate(iw, 0);
-			ctx.scale(-1, 1);
-			ctx.drawImage(pastedImage, iw / 2, 0, iw, ih, -1 * iw / 2, 0, iw, ih);
-			ctx.restore();
-
-		};
-		pastedImage.src = source;
-	};
-}
-*/
 export default {
 	name: 'HelloWorld',
 	props: {
