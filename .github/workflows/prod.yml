@@ -18,7 +18,7 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@4.1.1
         with:
           ssh-key: ${{ secrets.DEPLOY_KEY }}
-          repository-name: dochoncho/mirror-mirror.github.io
+          repository-name: mirrim-rorror/mirrim-rorror.github.io
           branch: master
           folder: dist
           clean: true
