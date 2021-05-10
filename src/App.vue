@@ -89,6 +89,41 @@
 										height="300"
 										ref="destImgCanvas"
 						></canvas>
+						<v-row>
+							<v-col>
+								<v-text-field
+										v-model="saveFilenameTemplate"
+										label="Filename"
+										persistent-hint
+										:hint="saveFilename"
+								></v-text-field>
+							</v-col>
+							<v-col>
+								<v-select
+										:items="saveFileTypes"
+										v-model="saveFileType"
+										item-text="label"
+										item-value="value"
+										return-object
+								></v-select>
+								<v-text-field
+										v-if="saveFileType.hasQuality"
+										type="number"
+										label="Quality"
+										v-model="saveCompression"
+										min=1
+										max=100
+								></v-text-field>
+							</v-col>
+							<v-col>
+								<v-btn
+										icon
+										v-on:click="doSave"
+								>
+									<v-icon>mdi-content-save</v-icon>
+								</v-btn>
+							</v-col>
+						</v-row>
 					</v-col>
 				</v-row>
 				<v-row>
@@ -102,6 +137,8 @@
 </template>
 
 <script>
+let path = require('path');
+
 export default {
 	name: 'App',
 	computed: {
@@ -129,11 +166,28 @@ export default {
 			}
 			return 1;
 		},
+		saveFilename () {
+			let str = this.saveFilenameTemplate;
+			let macros = [...str.matchAll(/{{(\w*)}}/g)];
+			for (let i = 0; i < macros.length; i++) {
+				const macro = macros[ i ];
+				if (macro[ 1 ] in this.filenameMacros) {
+					str = str.replace(macro[ 0 ], this.filenameMacros[ macro[ 1 ] ](str));
+				}
+			}
+
+			return str + '.' + this.saveFileType.ext;
+		},
 	},
 	data () {
-		return {
+		let data = {
+			saveUrl: '',
+			saveFilenameTemplate: '{{fileName}}-{{timestamp}}',
+			saveFileType: 'image/png',
+			saveCompression: 75,
 			isDragging: false,
 			srcImg: {
+				origFileName: '',
 				url: '',
 				width: 0,
 				height: 0,
@@ -142,34 +196,88 @@ export default {
 				bgColor: 'white',
 			},
 			destImg: null,
+			filenameMacros: {
+				'timestamp': () => {
+					return Date.now().toString();
+				},
+				'fileName': () => {
+					return this.srcImg.origFileName;
+				},
+			},
+			saveFileTypes: [
+				{
+					label: 'PNG',
+					value: 'image/png',
+					ext: 'png',
+					hasQuality: false,
+				},
+				{
+					label: 'JPEG',
+					value: 'image/jpeg',
+					ext: 'jpg',
+					hasQuality: true,
+				},
+			],
 		};
+
+		data.saveFileType = data.saveFileTypes[ 0 ];
+		return data;
 	},
 	watch: {},
 	methods: {
+		doSave () {
+			this.saveUrl = this.destImgCanvas.toDataURL(this.saveFileType.value, this.saveCompression / 100.0);
+
+			let link = document.createElement('a');
+			link.download = this.saveFilename;
+			link.href = 'data:' + this.saveUrl;
+			link.click();
+		},
+		createBitmap (imgSrc) {
+			createImageBitmap(imgSrc).then((bmp) => {
+				this.srcImg.bitmap = bmp;
+				this.srcImg.width = bmp.width;
+				this.srcImg.height = bmp.height;
+				this.srcImg.rotation = 0;
+				this.srcImg.translate = 0;
+
+				this.update();
+			}).catch((e) => {
+				console.log(e);
+			});
+		},
+		loadUrl (url) {
+			let img = new Image();
+			img.onload = () => {
+				this.createBitmap(img);
+			};
+			img.src = url;
+		},
 		handlePaste (event) {
 			if (event.clipboardData) {
 				let items = event.clipboardData.items;
 				if (!items) return;
 
 				//access data directly
-				let is_image = false;
 				for (let i = 0; i < items.length; i++) {
-					if (items[ i ].type.indexOf('image') !== -1) {
-						createImageBitmap(items[ i ].getAsFile()).then((bmp) => {
-							this.srcImg.bitmap = bmp;
-							this.srcImg.width = bmp.width;
-							this.srcImg.height = bmp.height;
-							this.srcImg.rotation = 0;
-							this.srcImg.translate = 0;
+					const item = items[ i ];
 
-							this.update();
+					if (item.type.indexOf('image') !== -1) {
+						let file = items[ i ].getAsFile();
+						this.createBitmap(file);
+						this.srcImg.origFileName = path.basename(file.name, path.extname(file.name));
+
+						event.preventDefault();
+					} else if (item.type.indexOf('plain') !== -1) {
+						item.getAsString((e) => {
+							if (e.indexOf('http') !== -1) {
+								this.loadUrl(e);
+								let t = new URL(e);
+								this.srcImg.origFileName = path.basename(t.pathname, path.extname(t.pathname));
+								event.preventDefault();
+							}
 						});
-
-						is_image = true;
 					}
-				}
-				if (is_image === true) {
-					event.preventDefault();
 				}
 			}
 		},
@@ -229,6 +337,26 @@ export default {
 	},
 	mounted () {
 		document.addEventListener('paste', (e) => { this.handlePaste(e); }, false);
+		document.addEventListener('dragenter', (e) => {
+
+			e.preventDefault();
+			e.stopPropagation();
+		});
+		document.addEventListener('dragleave', (e) => {
+
+			e.preventDefault();
+			e.stopPropagation();
+		});
+		document.addEventListener('dragover', (e) => {
+
+			e.preventDefault();
+			e.stopPropagation();
+		});
+		document.addEventListener('drop', (e) => {
+			console.log(e.dataTransfer.files);
+			e.preventDefault();
+			e.stopPropagation();
+		});
 
 		this.$refs.srcImgCanvas.addEventListener('mousedown', () => { this.isDragging = true; });
 		this.$refs.srcImgCanvas.addEventListener('mouseup', () => { this.isDragging = false; });
