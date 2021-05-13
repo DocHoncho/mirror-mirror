@@ -35,6 +35,11 @@
 											ref="srcImgCanvas"
 							></canvas>
 						</div>
+						<div>
+							<trim-field
+									v-model="srcImg.trim"
+							></trim-field>
+						</div>
 						<div style="min-width: 300px">
 							<v-slider
 									v-model="srcImg.translate"
@@ -137,10 +142,15 @@
 </template>
 
 <script>
+import TrimField from './components/TrimFields';
+
 let path = require('path');
 
 export default {
 	name: 'App',
+	components: {
+		TrimField,
+	},
 	computed: {
 		srcImgCanvas () {
 			return this.$refs.srcImgCanvas;
