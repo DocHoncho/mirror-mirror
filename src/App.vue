@@ -95,7 +95,7 @@
 										v-model="saveFilenameTemplate"
 										label="Filename"
 										persistent-hint
-										:hint="saveFilename"
+										:hint="getSaveFilename()"
 								></v-text-field>
 							</v-col>
 							<v-col>
@@ -166,27 +166,22 @@ export default {
 			}
 			return 1;
 		},
-		saveFilename () {
-			let str = this.saveFilenameTemplate;
-			let macros = [...str.matchAll(/{{(\w*)}}/g)];
-			for (let i = 0; i < macros.length; i++) {
-				const macro = macros[ i ];
-				if (macro[ 1 ] in this.filenameMacros) {
-					str = str.replace(macro[ 0 ], this.filenameMacros[ macro[ 1 ] ](str));
-				}
-			}
 
-			return str + '.' + this.saveFileType.ext;
-		},
 	},
 	data () {
 		let data = {
 			saveUrl: '',
-			saveFilenameTemplate: '{{fileName}}-{{timestamp}}',
+			saveFilenameTemplate: '{{timestamp}}',
 			saveFileType: 'image/png',
 			saveCompression: 75,
 			isDragging: false,
 			srcImg: {
+				trim: {
+					left: 0,
+					right: 0,
+					top: 0,
+					bottom: 0
+				},
 				origFileName: '',
 				url: '',
 				width: 0,
@@ -225,11 +220,23 @@ export default {
 	},
 	watch: {},
 	methods: {
+		getSaveFilename () {
+			let str = this.saveFilenameTemplate;
+			let macros = [...str.matchAll(/{{(\w*)}}/g)];
+			for (let i = 0; i < macros.length; i++) {
+				const macro = macros[ i ];
+				if (macro[ 1 ] in this.filenameMacros) {
+					str = str.replace(macro[ 0 ], this.filenameMacros[ macro[ 1 ] ](str));
+				}
+			}
+
+			return str + '.' + this.saveFileType.ext;
+		},
 		doSave () {
 			this.saveUrl = this.destImgCanvas.toDataURL(this.saveFileType.value, this.saveCompression / 100.0);
 
 			let link = document.createElement('a');
-			link.download = this.saveFilename;
+			link.download = this.getSaveFilename();
 			link.href = 'data:' + this.saveUrl;
 			link.click();
 		},
