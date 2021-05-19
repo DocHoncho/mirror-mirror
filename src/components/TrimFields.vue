@@ -5,6 +5,7 @@
 					type="number"
 					label="Left"
 					v-model="curTrim.left"
+					min="0"
 					v-on:input="handleInput"
 			></v-text-field>
 		</v-col>
@@ -13,6 +14,7 @@
 					type="number"
 					label="Right"
 					v-model="curTrim.right"
+					min="0"
 					v-on:input="handleInput"
 			></v-text-field>
 		</v-col>
@@ -21,6 +23,7 @@
 					type="number"
 					label="Top"
 					v-model="curTrim.top"
+					min="0"
 					v-on:input="handleInput"
 			></v-text-field>
 		</v-col>
@@ -29,6 +32,7 @@
 					type="number"
 					label="Bottom"
 					v-model="curTrim.bottom"
+					min="0"
 					v-on:input="handleInput"
 			></v-text-field>
 		</v-col>

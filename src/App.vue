@@ -142,14 +142,14 @@
 </template>
 
 <script>
-import TrimField from './components/TrimFields';
+// import TrimField from './components/TrimFields';
 
 let path = require('path');
 
 export default {
 	name: 'App',
 	components: {
-		TrimField,
+		// TrimField,
 	},
 	computed: {
 		srcImgCanvas () {
