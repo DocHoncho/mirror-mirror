@@ -298,6 +298,63 @@ export default {
 				}
 			}
 		},
+		drawSourceImage () {
+			let ctx = this.srcImgCtx;
+
+			ctx.save();
+			ctx.translate(this.srcImg.width / 2, this.srcImg.height / 2); // Center canvas for rotation
+			ctx.rotate(this.srcImg.rotation * Math.PI / 180);
+
+			ctx.drawImage(this.srcImg.bitmap,
+					this.srcImg.translate < 0 ? -this.srcImg.translate : 0, 0,
+					this.srcImg.width, this.srcImg.height,
+					-this.srcImg.width / 2, -this.srcImg.height / 2,
+					this.srcImg.width, this.srcImg.height,);
+			ctx.restore();
+		},
+		drawDestImage () {
+			// Draw dest left, normal orientation
+			let dctx = this.destImgCtx,
+					dcanv = this.destImgCanvas;
+			dcanv.width = this.srcImgCanvas.width * 2;
+			dcanv.height = this.srcImgCanvas.height;
+
+			dctx.drawImage(this.srcImgCanvas,
+					0, 0, this.srcImg.width / 2,
+					this.srcImg.height, 0, 0,
+					this.srcImg.width / 2, this.srcImg.height);
+			dctx.drawImage(this.srcImgCanvas,
+					this.srcImg.width / 2, 0,
+					this.srcImg.width / 2, this.srcImg.height,
+					this.srcImg.width * 1.5, 0,
+					this.srcImg.width / 2, this.srcImg.height);
+
+			dctx.save();
+			dctx.translate(this.srcImg.width, 0);
+			dctx.scale(-1, 1);
+			dctx.drawImage(this.srcImgCanvas,
+					0, 0,
+					this.srcImg.width / 2, this.srcImg.height,
+					0, 0,
+					this.srcImg.width / 2, this.srcImg.height);
+			dctx.drawImage(this.srcImgCanvas,
+					this.srcImg.width / 2, 0,
+					this.srcImg.width / 2, this.srcImg.height,
+					-this.srcImg.width / 2, 0,
+					this.srcImg.width / 2, this.srcImg.height);
+			dctx.restore();
+		},
+		drawSourceOverlay() {
+			let ctx = this.srcImgCtx;
+
+			ctx.strokeStyle = 'green';
+			ctx.lineWidth = 5;
+			ctx.beginPath();
+			ctx.setLineDash([10, 10]);
+			ctx.moveTo(this.srcImg.width / 2, 0);
+			ctx.lineTo(this.srcImg.width / 2, this.srcImg.height);
+			ctx.stroke();
+		},
 		update () {
 			if (this.srcImg.bitmap) {
 				this.srcImg.width = this.srcImg.bitmap.width - Math.abs(this.srcImg.translate);
@@ -314,41 +371,9 @@ export default {
 				ctx.fillStyle = this.srcImg.bgColor;
 				ctx.fillRect(0, 0, cw, ch);
 
-				ctx.save();
-				ctx.translate(cw / 2, ch / 2); // Center canvas for rotation
-				ctx.rotate(this.srcImg.rotation * Math.PI / 180);
-
-				// ctx.translate(this.srcImg.translate, 0);
-				let sx = this.srcImg.translate < 0 ? -this.srcImg.translate : 0,
-						sw = cw;
-
-				ctx.drawImage(this.srcImg.bitmap, sx, 0, sw, ch, -cw / 2, -ch / 2, cw, ch);
-				ctx.restore();
-
-				// Draw dest left, normal orientation
-				let dctx = this.destImgCtx,
-						dcanv = this.destImgCanvas;
-				dcanv.width = this.srcImgCanvas.width * 2;
-				dcanv.height = this.srcImgCanvas.height;
-
-				dctx.drawImage(this.srcImgCanvas, 0, 0, cw / 2, ch, 0, 0, cw / 2, ch);
-				dctx.drawImage(this.srcImgCanvas, cw / 2, 0, cw / 2, ch, cw * 1.5, 0, cw / 2, ch);
-
-				dctx.save();
-				dctx.translate(cw, 0);
-				dctx.scale(-1, 1);
-				dctx.drawImage(this.srcImgCanvas, 0, 0, cw / 2, ch, 0, 0, cw / 2, ch);
-				dctx.drawImage(this.srcImgCanvas, cw / 2, 0, cw / 2, ch, -cw / 2, 0, cw / 2, ch);
-				dctx.restore();
-
-				//let ctx2 = this.$refs.srcImgCanvas2.getContext('2d');
-				ctx.strokeStyle = 'green';
-				ctx.lineWidth = 5;
-				ctx.beginPath();
-				ctx.setLineDash([10, 10]);
-				ctx.moveTo(cw / 2, 0);
-				ctx.lineTo(cw / 2, ch);
-				ctx.stroke();
+				this.drawSourceImage();
+				this.drawSourceOverlay();
+				this.drawDestImage();
 			}
 		},
 	},
