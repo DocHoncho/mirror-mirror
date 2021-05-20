@@ -395,17 +395,14 @@ export default {
 	mounted () {
 		document.addEventListener('paste', (e) => { this.handlePaste(e); }, false);
 		document.addEventListener('dragenter', (e) => {
-
 			e.preventDefault();
 			e.stopPropagation();
 		});
 		document.addEventListener('dragleave', (e) => {
-
 			e.preventDefault();
 			e.stopPropagation();
 		});
 		document.addEventListener('dragover', (e) => {
-
 			e.preventDefault();
 			e.stopPropagation();
 		});
