@@ -50,6 +50,7 @@
 											style="border:1px solid grey;"
 											width="300"
 							></canvas>
+							<div>{{ this.srcImg.bbox }}</div>
 						</div>
 						<div style="min-width: 300px">
 							<v-slider
@@ -203,6 +204,7 @@ export default {
 	data () {
 		let data = {
 			dragCounter: 0,
+			isUpdating: false,
 			saveUrl: '',
 			saveFilenameTemplate: '{{timestamp}}',
 			saveFileType: 'image/png',
@@ -210,6 +212,12 @@ export default {
 			isDragging: false,
 			isFileDragging: false,
 			srcImg: {
+				bbox: {
+					left: 0,
+					right: 0,
+					top: 0,
+					bottom: 0,
+				},
 				trim: {
 					left: 0,
 					right: 0,
@@ -279,6 +287,10 @@ export default {
 				this.srcImg.bitmap = bmp;
 				this.srcImg.width = bmp.width;
 				this.srcImg.height = bmp.height;
+				this.srcImg.bbox.left = 0;
+				this.srcImg.bbox.right = bmp.width;
+				this.srcImg.bbox.top = 0;
+				this.srcImg.bbox.bottom = bmp.height;
 				this.srcImg.rotation = 0;
 				this.srcImg.translate = 0;
 
@@ -330,8 +342,11 @@ export default {
 			ctx.rotate(this.srcImg.rotation * Math.PI / 180);
 
 			ctx.drawImage(this.srcImg.bitmap,
-					this.srcImg.translate < 0 ? -this.srcImg.translate : 0, 0,
+					// this.srcImg.translate < 0 ? -this.srcImg.translate : 0, 0,
+					0, 0,
 					this.srcImg.width, this.srcImg.height,
+					// this.srcImg.bbox.left, this.srcImg.bbox.top,
+					// this.srcImg.bbox.right, this.srcImg.bbox.bottom,
 					-this.srcImg.width / 2, -this.srcImg.height / 2,
 					this.srcImg.width, this.srcImg.height);
 			ctx.restore();
@@ -340,32 +355,37 @@ export default {
 			// Draw dest left, normal orientation
 			let dctx = this.destImgCtx,
 					dcanv = this.destImgCanvas;
-			dcanv.width = this.srcImgCanvas.width * 2;
-			dcanv.height = this.srcImgCanvas.height;
+
+			let cx = this.srcImg.bbox.width,
+					cw = this.srcImg.bbox.center;
+
+			dcanv.width = cw * 4;
+			dcanv.height = this.srcImg.height;
 
 			dctx.drawImage(this.srcImgCanvas,
-					0, 0, this.srcImg.width / 2,
-					this.srcImg.height, 0, 0,
-					this.srcImg.width / 2, this.srcImg.height);
+					0, 0,
+					cx, this.srcImg.height,
+					0, 0,
+					cx, this.srcImg.height);
 			dctx.drawImage(this.srcImgCanvas,
-					this.srcImg.width / 2, 0,
-					this.srcImg.width / 2, this.srcImg.height,
-					this.srcImg.width * 1.5, 0,
-					this.srcImg.width / 2, this.srcImg.height);
+					cx, 0,
+					cx, this.srcImg.height,
+					3 * cw, 0,
+					cx, this.srcImg.height);
 
 			dctx.save();
-			dctx.translate(this.srcImg.width, 0);
+			dctx.translate(this.srcImg.bbox.right, 0);
 			dctx.scale(-1, 1);
-			dctx.drawImage(this.srcImgCanvas,
-					0, 0,
-					this.srcImg.width / 2, this.srcImg.height,
-					0, 0,
-					this.srcImg.width / 2, this.srcImg.height);
-			dctx.drawImage(this.srcImgCanvas,
-					this.srcImg.width / 2, 0,
-					this.srcImg.width / 2, this.srcImg.height,
-					-this.srcImg.width / 2, 0,
-					this.srcImg.width / 2, this.srcImg.height);
+			// dctx.drawImage(this.srcImgCanvas,
+			// 		0, 0,
+			// 		cx, this.srcImg.height,
+			// 		-this.srcImg.bbox.left, 0,
+			// 		cx, this.srcImg.height);
+			// dctx.drawImage(this.srcImgCanvas,
+			// 		cx, 0,
+			// 		cx, this.srcImg.height,
+			// 		-cx, 0,
+			// 		cx / 2, this.srcImg.height);
 			dctx.restore();
 		},
 		drawSourceOverlay () {
@@ -373,31 +393,51 @@ export default {
 
 			ctx.strokeStyle = 'green';
 			ctx.lineWidth = 5;
+
+			ctx.strokeRect(this.srcImg.bbox.left, this.srcImg.bbox.top,
+					this.srcImg.bbox.right, this.srcImg.bbox.bottom);
+
 			ctx.beginPath();
 			ctx.setLineDash([10, 10]);
-			ctx.moveTo(this.srcImg.width / 2, 0);
-			ctx.lineTo(this.srcImg.width / 2, this.srcImg.height);
+			let cx = this.srcImg.bbox.left + (this.srcImg.bbox.right / 2);
+			ctx.moveTo(cx, 0);
+			ctx.lineTo(cx, this.srcImg.height);
 			ctx.stroke();
+
 		},
 		update () {
-			if (this.srcImg.bitmap) {
-				this.srcImg.width = this.srcImg.bitmap.width - Math.abs(this.srcImg.translate);
-				this.srcImg.height = this.srcImg.bitmap.height;
+			if (!this.isUpdating) {
+				this.isUpdating = true;
 
-				const canvas = this.srcImgCanvas,
-						ctx = this.srcImgCtx,
-						cw = this.srcImg.width,
-						ch = this.srcImg.height;
+				if (this.srcImg.bitmap) {
+					// this.srcImg.width = this.srcImg.bitmap.width - Math.abs(this.srcImg.translate);
+					// this.srcImg.height = this.srcImg.bitmap.height;
 
-				canvas.width = cw;
-				canvas.height = ch;
+					const canvas = this.srcImgCanvas,
+							ctx = this.srcImgCtx;
 
-				ctx.fillStyle = this.srcImg.bgColor;
-				ctx.fillRect(0, 0, cw, ch);
+					this.srcImg.bbox.left = (this.srcImg.translate > 0 ? this.srcImg.translate : 0);
 
-				this.drawSourceImage();
-				this.drawSourceOverlay();
-				this.drawDestImage();
+					this.srcImg.bbox.right = this.srcImg.width - (this.srcImg.translate > 0 ? this.srcImg.translate : -this.srcImg.translate);
+					// if (this.srcImg.bbox.right > this.srcImg.width) this.srcImg.bbox.right = this.srcImg.width;
+
+					this.srcImg.bbox.width = (this.srcImg.bbox.right - this.srcImg.bbox.left);
+					this.srcImg.bbox.center = this.srcImg.bbox.width + this.srcImg.bbox.left;
+					this.srcImg.bbox.center = this.srcImg.bbox.left + (this.srcImg.bbox.right / 2);
+
+					canvas.width = this.srcImg.width;
+					canvas.height = this.srcImg.height;
+
+					ctx.fillStyle = this.srcImg.bgColor;
+					ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+					this.drawSourceImage();
+					this.drawDestImage();
+					this.drawSourceOverlay();
+
+				}
+
+				this.isUpdating = false;
 			}
 		},
 	},
