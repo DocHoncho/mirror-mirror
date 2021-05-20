@@ -437,8 +437,8 @@ export default {
 			}
 		});
 
-		this.srcImg.url = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Max_Hardcore_2015.jpg/800px-Max_Hardcore_2015.jpg';
-		this.update();
+		this.srcImg.url = 'https://thispersondoesnotexist.com/image';
+		this.loadUrl(this.srcImg.url);
 	},
 };
 </script>
