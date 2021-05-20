@@ -12,7 +12,22 @@
 			</div>
 
 			<v-spacer></v-spacer>
-
+			<v-btn
+					icon
+			>
+				<v-icon>mdi-help-circle-outline</v-icon>
+			</v-btn>
+			<a
+					href="https://github.com/mirrim-rorror/mirrim-rorror"
+					class="v-btn v-btn--icon v-btn--round theme--dark v-size--default"
+			>
+				<v-icon>mdi-github</v-icon>
+			</a>
+			<v-btn
+					icon
+			>
+				<v-icon>mdi-cog</v-icon>
+			</v-btn>
 		</v-app-bar>
 
 		<v-main>
