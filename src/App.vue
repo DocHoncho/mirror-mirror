@@ -153,6 +153,17 @@
 				</v-row>
 			</v-container>
 		</v-main>
+		<v-overlay
+				absolute
+				:value="isFileDragging"
+		>
+			<v-row>
+				<v-col>
+					<v-icon>mdi-download</v-icon>
+					Drop file to load
+				</v-col>
+			</v-row>
+		</v-overlay>
 	</v-app>
 </template>
 
@@ -195,11 +206,13 @@ export default {
 	},
 	data () {
 		let data = {
+			dragCounter: 0,
 			saveUrl: '',
 			saveFilenameTemplate: '{{timestamp}}',
 			saveFileType: 'image/png',
 			saveCompression: 75,
 			isDragging: false,
+			isFileDragging: false,
 			srcImg: {
 				trim: {
 					left: 0,
@@ -395,19 +408,31 @@ export default {
 	mounted () {
 		document.addEventListener('paste', (e) => { this.handlePaste(e); }, false);
 		document.addEventListener('dragenter', (e) => {
+			this.dragCounter++;
+			this.isFileDragging = true;
 			e.preventDefault();
 			e.stopPropagation();
 		});
 		document.addEventListener('dragleave', (e) => {
+			this.dragCounter--;
+			if(this.dragCounter === 0) {
+				this.isFileDragging = false;
+			}
 			e.preventDefault();
 			e.stopPropagation();
 		});
 		document.addEventListener('dragover', (e) => {
+			this.isFileDragging = true;
 			e.preventDefault();
 			e.stopPropagation();
 		});
 		document.addEventListener('drop', (e) => {
-			console.log(e.dataTransfer.files);
+			let file = e.dataTransfer.files[ 0 ];
+			this.createBitmap(file);
+			this.srcImg.origFileName = path.basename(file.name, path.extname(file.name));
+			this.update();
+
+			this.isFileDragging = false;
 			e.preventDefault();
 			e.stopPropagation();
 		});
