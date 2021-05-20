@@ -2,37 +2,37 @@
 	<v-row>
 		<v-col>
 			<v-text-field
-					type="number"
-					label="Left"
 					v-model="curTrim.left"
+					label="Left"
 					min="0"
+					type="number"
 					v-on:input="handleInput"
 			></v-text-field>
 		</v-col>
 		<v-col>
 			<v-text-field
-					type="number"
-					label="Right"
 					v-model="curTrim.right"
+					label="Right"
 					min="0"
+					type="number"
 					v-on:input="handleInput"
 			></v-text-field>
 		</v-col>
 		<v-col>
 			<v-text-field
-					type="number"
-					label="Top"
 					v-model="curTrim.top"
+					label="Top"
 					min="0"
+					type="number"
 					v-on:input="handleInput"
 			></v-text-field>
 		</v-col>
 		<v-col>
 			<v-text-field
-					type="number"
-					label="Bottom"
 					v-model="curTrim.bottom"
+					label="Bottom"
 					min="0"
+					type="number"
 					v-on:input="handleInput"
 			></v-text-field>
 		</v-col>
@@ -62,7 +62,7 @@ export default {
 	methods: {
 		handleInput () {
 			this.$emit('input', this.curTrim);
-		}
-	}
+		},
+	},
 };
 </script>

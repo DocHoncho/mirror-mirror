@@ -25,14 +25,14 @@
 					<v-col cols="12"
 								 sm="4"
 					>
-						<div class="viewport"
-								 ref="srcView"
+						<div ref="srcView"
+								 class="viewport"
 						>
-							<canvas style="border:1px solid grey;"
-											id="srcImgCanvas"
-											width="300"
-											height="300"
+							<canvas id="srcImgCanvas"
 											ref="srcImgCanvas"
+											height="300"
+											style="border:1px solid grey;"
+											width="300"
 							></canvas>
 						</div>
 						<div>
@@ -43,9 +43,9 @@
 						<div style="min-width: 300px">
 							<v-slider
 									v-model="srcImg.translate"
-									label="Shift"
-									:min="srcImgMin"
 									:max="srcImgMax"
+									:min="srcImgMin"
+									label="Shift"
 									v-on:input="update"
 							>
 								<template v-slot:append>
@@ -54,8 +54,8 @@
 											class="mt-0 pt-0"
 											hide-details
 											single-line
-											type="number"
 											style="width:60px"
+											type="number"
 											v-on:input="update"
 									></v-text-field>
 								</template>
@@ -63,8 +63,8 @@
 							<v-slider
 									v-model="srcImg.rotation"
 									label="Rotation"
-									min="-180"
 									max="180"
+									min="-180"
 									v-on:input="update"
 							>
 								<template v-slot:append>
@@ -73,8 +73,8 @@
 											class="mt-0 pt-0"
 											hide-details
 											single-line
-											type="number"
 											style="width:60px"
+											type="number"
 											v-on:input="update"
 									></v-text-field>
 								</template>
@@ -88,36 +88,36 @@
 					<v-col cols="12"
 								 sm="8"
 					>
-						<canvas style="border:1px solid grey;"
-										id="destImgCanvas"
-										width="300"
-										height="300"
+						<canvas id="destImgCanvas"
 										ref="destImgCanvas"
+										height="300"
+										style="border:1px solid grey;"
+										width="300"
 						></canvas>
 						<v-row>
 							<v-col>
 								<v-text-field
 										v-model="saveFilenameTemplate"
+										:hint="getSaveFilename()"
 										label="Filename"
 										persistent-hint
-										:hint="getSaveFilename()"
 								></v-text-field>
 							</v-col>
 							<v-col>
 								<v-select
-										:items="saveFileTypes"
 										v-model="saveFileType"
+										:items="saveFileTypes"
 										item-text="label"
 										item-value="value"
 										return-object
 								></v-select>
 								<v-text-field
 										v-if="saveFileType.hasQuality"
-										type="number"
-										label="Quality"
 										v-model="saveCompression"
-										min=1
+										label="Quality"
 										max=100
+										min=1
+										type="number"
 								></v-text-field>
 							</v-col>
 							<v-col>
@@ -190,7 +190,7 @@ export default {
 					left: 0,
 					right: 0,
 					top: 0,
-					bottom: 0
+					bottom: 0,
 				},
 				origFileName: '',
 				url: '',
@@ -309,7 +309,7 @@ export default {
 					this.srcImg.translate < 0 ? -this.srcImg.translate : 0, 0,
 					this.srcImg.width, this.srcImg.height,
 					-this.srcImg.width / 2, -this.srcImg.height / 2,
-					this.srcImg.width, this.srcImg.height,);
+					this.srcImg.width, this.srcImg.height);
 			ctx.restore();
 		},
 		drawDestImage () {
@@ -344,7 +344,7 @@ export default {
 					this.srcImg.width / 2, this.srcImg.height);
 			dctx.restore();
 		},
-		drawSourceOverlay() {
+		drawSourceOverlay () {
 			let ctx = this.srcImgCtx;
 
 			ctx.strokeStyle = 'green';
