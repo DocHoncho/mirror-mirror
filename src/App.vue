@@ -50,7 +50,6 @@
 											style="border:1px solid grey;"
 											width="300"
 							></canvas>
-							<div>{{ this.srcImg.bbox }}</div>
 						</div>
 						<div style="min-width: 300px">
 							<v-slider
