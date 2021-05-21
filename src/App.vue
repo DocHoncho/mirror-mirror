@@ -375,36 +375,36 @@ export default {
 			let dctx = this.destImgCtx,
 					dcanv = this.destImgCanvas;
 
-			let cx = this.srcImg.bbox.width,
-					cw = this.srcImg.bbox.center;
+			let bb = this.srcImg.bbox;
 
-			dcanv.width = cw * 4;
+			dcanv.width = bb.width * 2;
 			dcanv.height = this.srcImg.height;
 
 			dctx.drawImage(this.srcImgCanvas,
+					bb.left, 0,
+					bb.width / 2, this.srcImg.height,
 					0, 0,
-					cx, this.srcImg.height,
-					0, 0,
-					cx, this.srcImg.height);
+					bb.width / 2, this.srcImg.height);
 			dctx.drawImage(this.srcImgCanvas,
-					cx, 0,
-					cx, this.srcImg.height,
-					3 * cw, 0,
-					cx, this.srcImg.height);
+					bb.left + bb.width / 2, 0,
+					bb.width / 2, this.srcImg.height,
+					1.5 * bb.width, 0,
+					bb.width / 2, this.srcImg.height);
 
 			dctx.save();
-			dctx.translate(this.srcImg.bbox.right, 0);
+			dctx.translate(bb.width, 0);
 			dctx.scale(-1, 1);
-			// dctx.drawImage(this.srcImgCanvas,
-			// 		0, 0,
-			// 		cx, this.srcImg.height,
-			// 		-this.srcImg.bbox.left, 0,
-			// 		cx, this.srcImg.height);
-			// dctx.drawImage(this.srcImgCanvas,
-			// 		cx, 0,
-			// 		cx, this.srcImg.height,
-			// 		-cx, 0,
-			// 		cx / 2, this.srcImg.height);
+			dctx.drawImage(this.srcImgCanvas,
+					bb.left, 0,
+					bb.width / 2, this.srcImg.height,
+					0, 0,
+					bb.width / 2, this.srcImg.height);
+
+			dctx.drawImage(this.srcImgCanvas,
+					bb.width/2, 0,
+					bb.width/2, this.srcImg.height,
+					-bb.width/2, 0,
+					bb.width/2, this.srcImg.height);
 			dctx.restore();
 		},
 		drawSourceOverlay () {
