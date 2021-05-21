@@ -401,7 +401,7 @@ export default {
 					bb.width / 2, this.srcImg.height);
 
 			dctx.drawImage(this.srcImgCanvas,
-					bb.width/2, 0,
+					bb.width/2+bb.left, 0,
 					bb.width/2, this.srcImg.height,
 					-bb.width/2, 0,
 					bb.width/2, this.srcImg.height);
