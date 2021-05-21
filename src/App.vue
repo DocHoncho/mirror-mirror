@@ -245,7 +245,7 @@ export default {
 				height: 0,
 				translate: 0,
 				rotation: 0,
-				bgColor: 'white',
+				bgColor: '#FFF',
 			},
 			destImg: null,
 			filenameMacros: {
