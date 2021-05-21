@@ -3,6 +3,8 @@ import App from './App.vue';
 import vuetify from './plugins/vuetify';
 
 Vue.config.productionTip = false;
+Vue.prototype.$APP_VERSION = '0.1.0';
+Vue.prototype.$BUILD_DATE = "<%=__BUILD_DATE__%>";
 
 new Vue({
   vuetify,
