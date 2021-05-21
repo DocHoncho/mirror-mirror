@@ -54,15 +54,34 @@
 						</div>
 						<div style="min-width: 300px">
 							<v-slider
-									v-model="srcImg.translate"
+									v-model="srcImg.bbox.left"
 									:max="srcImgMax"
-									:min="srcImgMin"
-									label="Shift"
+									:min="0"
+									label="Left"
 									v-on:input="update"
 							>
 								<template v-slot:append>
 									<v-text-field
-											v-model="srcImg.translate"
+											v-model="srcImg.bbox.left"
+											class="mt-0 pt-0"
+											hide-details
+											single-line
+											style="width:60px"
+											type="number"
+											v-on:input="update"
+									></v-text-field>
+								</template>
+							</v-slider>
+							<v-slider
+									v-model="srcImg.bbox.right"
+									:max="srcImgMax"
+									:min="0"
+									label="Right"
+									v-on:input="update"
+							>
+								<template v-slot:append>
+									<v-text-field
+											v-model="srcImg.bbox.right"
 											class="mt-0 pt-0"
 											hide-details
 											single-line
@@ -195,7 +214,7 @@ export default {
 		},
 		srcImgMax () {
 			if (this.srcImg) {
-				return this.srcImg.width / 2;
+				return this.srcImg.width;
 			}
 			return 1;
 		},
@@ -395,11 +414,11 @@ export default {
 			ctx.lineWidth = 5;
 
 			ctx.strokeRect(this.srcImg.bbox.left, this.srcImg.bbox.top,
-					this.srcImg.bbox.right, this.srcImg.bbox.bottom);
+					this.srcImg.bbox.width, this.srcImg.bbox.bottom);
 
 			ctx.beginPath();
 			ctx.setLineDash([10, 10]);
-			let cx = this.srcImg.bbox.left + (this.srcImg.bbox.right / 2);
+			let cx = this.srcImg.bbox.left + (this.srcImg.bbox.width / 2);
 			ctx.moveTo(cx, 0);
 			ctx.lineTo(cx, this.srcImg.height);
 			ctx.stroke();
@@ -416,9 +435,8 @@ export default {
 					const canvas = this.srcImgCanvas,
 							ctx = this.srcImgCtx;
 
-					this.srcImg.bbox.left = (this.srcImg.translate > 0 ? this.srcImg.translate : 0);
-
-					this.srcImg.bbox.right = this.srcImg.width - (this.srcImg.translate > 0 ? this.srcImg.translate : -this.srcImg.translate);
+					// this.srcImg.bbox.left = (this.srcImg.translate > 0 ? this.srcImg.translate : 0);
+					// this.srcImg.bbox.right = this.srcImg.width - (this.srcImg.translate > 0 ? this.srcImg.translate : -this.srcImg.translate);
 					// if (this.srcImg.bbox.right > this.srcImg.width) this.srcImg.bbox.right = this.srcImg.width;
 
 					this.srcImg.bbox.width = (this.srcImg.bbox.right - this.srcImg.bbox.left);
