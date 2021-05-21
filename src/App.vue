@@ -8,7 +8,7 @@
 			<div class="d-flex align-center">
 				<div class="app-title">
 					<span>MIR</span><span class="mflip">R</span><span class="mflip">I</span><span class="mflip">M</span>&nbsp;<span class="mflip">R</span><span class="mflip">O</span><span class="mflip">R</span><span>ROR</span>
-					v{{$APP_VERSION}}
+					v{{ $APP_VERSION }}
 				</div>
 			</div>
 
@@ -452,7 +452,6 @@ export default {
 					this.drawSourceImage();
 					this.drawDestImage();
 					this.drawSourceOverlay();
-
 				}
 
 				this.isUpdating = false;
@@ -469,7 +468,7 @@ export default {
 		});
 		document.addEventListener('dragleave', (e) => {
 			this.dragCounter--;
-			if(this.dragCounter === 0) {
+			if (this.dragCounter === 0) {
 				this.isFileDragging = false;
 			}
 			e.preventDefault();
