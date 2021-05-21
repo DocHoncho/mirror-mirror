@@ -51,11 +51,6 @@
 											width="300"
 							></canvas>
 						</div>
-						<div>
-							<trim-field
-									v-model="srcImg.trim"
-							></trim-field>
-						</div>
 						<div style="min-width: 300px">
 							<v-slider
 									v-model="srcImg.translate"
