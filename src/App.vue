@@ -184,15 +184,11 @@
 </template>
 
 <script>
-// import TrimField from './components/TrimFields';
-
 let path = require('path');
 
 export default {
 	name: 'App',
-	components: {
-		// TrimField,
-	},
+	components: {},
 	computed: {
 		srcImgCanvas () {
 			return this.$refs.srcImgCanvas;
@@ -361,11 +357,8 @@ export default {
 			ctx.rotate(this.srcImg.rotation * Math.PI / 180);
 
 			ctx.drawImage(this.srcImg.bitmap,
-					// this.srcImg.translate < 0 ? -this.srcImg.translate : 0, 0,
 					0, 0,
 					this.srcImg.width, this.srcImg.height,
-					// this.srcImg.bbox.left, this.srcImg.bbox.top,
-					// this.srcImg.bbox.right, this.srcImg.bbox.bottom,
 					-this.srcImg.width / 2, -this.srcImg.height / 2,
 					this.srcImg.width, this.srcImg.height);
 			ctx.restore();
@@ -380,11 +373,23 @@ export default {
 			dcanv.width = bb.width * 2;
 			dcanv.height = this.srcImg.height;
 
+			// Left
 			dctx.drawImage(this.srcImgCanvas,
 					bb.left, 0,
 					bb.width / 2, this.srcImg.height,
 					0, 0,
 					bb.width / 2, this.srcImg.height);
+			dctx.save();
+			dctx.translate(bb.width, 0);
+			dctx.scale(-1, 1);
+			dctx.drawImage(this.srcImgCanvas,
+					bb.left, 0,
+					bb.width / 2, this.srcImg.height,
+					0, 0,
+					bb.width / 2, this.srcImg.height);
+			dctx.restore();
+
+			// Right
 			dctx.drawImage(this.srcImgCanvas,
 					bb.left + bb.width / 2, 0,
 					bb.width / 2, this.srcImg.height,
@@ -394,12 +399,6 @@ export default {
 			dctx.save();
 			dctx.translate(bb.width, 0);
 			dctx.scale(-1, 1);
-			dctx.drawImage(this.srcImgCanvas,
-					bb.left, 0,
-					bb.width / 2, this.srcImg.height,
-					0, 0,
-					bb.width / 2, this.srcImg.height);
-
 			dctx.drawImage(this.srcImgCanvas,
 					bb.width/2+bb.left, 0,
 					bb.width/2, this.srcImg.height,
@@ -429,15 +428,8 @@ export default {
 				this.isUpdating = true;
 
 				if (this.srcImg.bitmap) {
-					// this.srcImg.width = this.srcImg.bitmap.width - Math.abs(this.srcImg.translate);
-					// this.srcImg.height = this.srcImg.bitmap.height;
-
 					const canvas = this.srcImgCanvas,
 							ctx = this.srcImgCtx;
-
-					// this.srcImg.bbox.left = (this.srcImg.translate > 0 ? this.srcImg.translate : 0);
-					// this.srcImg.bbox.right = this.srcImg.width - (this.srcImg.translate > 0 ? this.srcImg.translate : -this.srcImg.translate);
-					// if (this.srcImg.bbox.right > this.srcImg.width) this.srcImg.bbox.right = this.srcImg.width;
 
 					this.srcImg.bbox.width = (this.srcImg.bbox.right - this.srcImg.bbox.left);
 					this.srcImg.bbox.center = this.srcImg.bbox.width + this.srcImg.bbox.left;
