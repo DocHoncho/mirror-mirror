@@ -51,69 +51,7 @@
 											width="300"
 							></canvas>
 						</div>
-						<div style="min-width: 300px">
-							<v-slider
-									v-model="srcImg.bbox.left"
-									:max="srcImgMax"
-									:min="0"
-									label="Left"
-									v-on:input="update"
-							>
-								<template v-slot:append>
-									<v-text-field
-											v-model="srcImg.bbox.left"
-											class="mt-0 pt-0"
-											hide-details
-											single-line
-											style="width:60px"
-											type="number"
-											v-on:input="update"
-									></v-text-field>
-								</template>
-							</v-slider>
-							<v-slider
-									v-model="srcImg.bbox.right"
-									:max="srcImgMax"
-									:min="0"
-									label="Right"
-									v-on:input="update"
-							>
-								<template v-slot:append>
-									<v-text-field
-											v-model="srcImg.bbox.right"
-											class="mt-0 pt-0"
-											hide-details
-											single-line
-											style="width:60px"
-											type="number"
-											v-on:input="update"
-									></v-text-field>
-								</template>
-							</v-slider>
-							<v-slider
-									v-model="srcImg.rotation"
-									label="Rotation"
-									max="180"
-									min="-180"
-									v-on:input="update"
-							>
-								<template v-slot:append>
-									<v-text-field
-											v-model="srcImg.rotation"
-											class="mt-0 pt-0"
-											hide-details
-											single-line
-											style="width:60px"
-											type="number"
-											v-on:input="update"
-									></v-text-field>
-								</template>
-							</v-slider>
-							<v-color-picker
-									v-model="srcImg.bgColor"
-									v-on:input="update"
-							></v-color-picker>
-						</div>
+
 					</v-col>
 					<v-col cols="12"
 								 sm="8"
@@ -124,47 +62,146 @@
 										style="border:1px solid grey;"
 										width="300"
 						></canvas>
-						<v-row>
-							<v-col>
-								<v-text-field
-										v-model="saveFilenameTemplate"
-										:hint="getSaveFilename()"
-										label="Filename"
-										persistent-hint
-								></v-text-field>
-							</v-col>
-							<v-col>
-								<v-select
-										v-model="saveFileType"
-										:items="saveFileTypes"
-										item-text="label"
-										item-value="value"
-										return-object
-								></v-select>
-								<v-text-field
-										v-if="saveFileType.hasQuality"
-										v-model="saveCompression"
-										label="Quality"
-										max=100
-										min=1
-										type="number"
-								></v-text-field>
-							</v-col>
-							<v-col>
-								<v-btn
-										icon
-										v-on:click="doSave"
-								>
-									<v-icon>mdi-content-save</v-icon>
-								</v-btn>
-							</v-col>
-						</v-row>
+
 					</v-col>
 				</v-row>
 				<v-row>
 					<v-col>
-
+						<div>
+							<v-switch
+									v-model="symmetricalBox"
+									:label="boxModeLabel"
+							/>
+							<div
+									v-if="symmetricalBox"
+									style="min-width: 300px"
+							>
+								<v-slider
+										v-model="srcImg.bbox.left"
+										:max="srcImgMax"
+										:min="0"
+										label="Left"
+										v-on:input="update"
+								>
+									<template v-slot:append>
+										<v-text-field
+												v-model="srcImg.bbox.left"
+												class="mt-0 pt-0"
+												hide-details
+												single-line
+												style="width:60px"
+												type="number"
+												v-on:input="update"
+										></v-text-field>
+									</template>
+								</v-slider>
+								<v-slider
+										v-model="srcImg.bbox.right"
+										:max="srcImgMax"
+										:min="0"
+										label="Right"
+										v-on:input="update"
+								>
+									<template v-slot:append>
+										<v-text-field
+												v-model="srcImg.bbox.right"
+												class="mt-0 pt-0"
+												hide-details
+												single-line
+												style="width:60px"
+												type="number"
+												v-on:input="update"
+										></v-text-field>
+									</template>
+								</v-slider>
+							</div>
+							<div
+									v-else
+									style="min-width: 300px"
+							>
+								<v-slider
+										v-model="srcImg.bbox.center"
+										:max="srcImgMax"
+										:min="0"
+										label="Center"
+										v-on:input="update"
+								>
+									<template v-slot:append>
+										<v-text-field
+												v-model="srcImg.bbox.center"
+												class="mt-0 pt-0"
+												hide-details
+												single-line
+												style="width:60px"
+												type="number"
+												v-on:input="update"
+										></v-text-field>
+									</template>
+								</v-slider>
+							</div>
+							<div
+									style="min-width: 300px"
+							>
+								<v-slider
+										v-model="srcImg.rotation"
+										label="Rotation"
+										max="180"
+										min="-180"
+										v-on:input="update"
+								>
+									<template v-slot:append>
+										<v-text-field
+												v-model="srcImg.rotation"
+												class="mt-0 pt-0"
+												hide-details
+												single-line
+												style="width:60px"
+												type="number"
+												v-on:input="update"
+										></v-text-field>
+									</template>
+								</v-slider>
+								<v-color-picker
+										v-model="srcImg.bgColor"
+										v-on:input="update"
+								></v-color-picker>
+							</div>
+						</div>
 					</v-col>
+					<v-col>
+						<v-text-field
+								v-model="saveFilenameTemplate"
+								:hint="getSaveFilename()"
+								label="Filename"
+								persistent-hint
+						></v-text-field>
+					</v-col>
+					<v-col>
+						<v-select
+								v-model="saveFileType"
+								:items="saveFileTypes"
+								item-text="label"
+								item-value="value"
+								return-object
+						></v-select>
+						<v-text-field
+								v-if="saveFileType.hasQuality"
+								v-model="saveCompression"
+								label="Quality"
+								max=100
+								min=1
+								type="number"
+						></v-text-field>
+					</v-col>
+					<v-col>
+						<v-btn
+								icon
+								v-on:click="doSave"
+						>
+							<v-icon>mdi-content-save</v-icon>
+						</v-btn>
+					</v-col>
+
 				</v-row>
 			</v-container>
 		</v-main>
@@ -213,7 +250,13 @@ export default {
 			}
 			return 1;
 		},
-
+		boxModeLabel () {
+			if (this.symmetricalBox) {
+				return 'Symmetric';
+			} else {
+				return 'Asymmetric';
+			}
+		},
 	},
 	data () {
 		let data = {
@@ -225,6 +268,7 @@ export default {
 			saveCompression: 75,
 			isDragging: false,
 			isFileDragging: false,
+			symmetricalBox: false,
 			srcImg: {
 				bbox: {
 					left: 0,
@@ -305,8 +349,9 @@ export default {
 				this.srcImg.bbox.right = bmp.width;
 				this.srcImg.bbox.top = 0;
 				this.srcImg.bbox.bottom = bmp.height;
+				this.srcImg.bbox.center = bmp.width / 3;
 				this.srcImg.rotation = 0;
-				this.srcImg.translate = 0;
+				this.srcImg.translate = this.srcImg.width / 2;
 
 				this.update();
 			}).catch((e) => {
@@ -319,6 +364,7 @@ export default {
 				this.createBitmap(img);
 			};
 			img.src = url;
+
 		},
 		handlePaste (event) {
 			if (event.clipboardData) {
@@ -372,38 +418,73 @@ export default {
 			dcanv.width = bb.width * 2;
 			dcanv.height = this.srcImg.height;
 
-			// Left
-			dctx.drawImage(this.srcImgCanvas,
-					bb.left, 0,
-					bb.width / 2, this.srcImg.height,
-					0, 0,
-					bb.width / 2, this.srcImg.height);
-			dctx.save();
-			dctx.translate(bb.width, 0);
-			dctx.scale(-1, 1);
-			dctx.drawImage(this.srcImgCanvas,
-					bb.left, 0,
-					bb.width / 2, this.srcImg.height,
-					0, 0,
-					bb.width / 2, this.srcImg.height);
-			dctx.restore();
+			if (this.symmetricalBox) {
+				// Left
+				dctx.drawImage(this.srcImgCanvas,
+						bb.left, 0,
+						bb.width / 2, this.srcImg.height,
+						0, 0,
+						bb.width / 2, this.srcImg.height);
+				dctx.save();
+				dctx.translate(bb.width, 0);
+				dctx.scale(-1, 1);
+				dctx.drawImage(this.srcImgCanvas,
+						bb.left, 0,
+						bb.width / 2, this.srcImg.height,
+						0, 0,
+						bb.width / 2, this.srcImg.height);
+				dctx.restore();
 
-			// Right
-			dctx.drawImage(this.srcImgCanvas,
-					bb.left + bb.width / 2, 0,
-					bb.width / 2, this.srcImg.height,
-					1.5 * bb.width, 0,
-					bb.width / 2, this.srcImg.height);
+				// Right
+				dctx.drawImage(this.srcImgCanvas,
+						bb.left + bb.width / 2, 0,
+						bb.width / 2, this.srcImg.height,
+						1.5 * bb.width, 0,
+						bb.width / 2, this.srcImg.height);
 
-			dctx.save();
-			dctx.translate(bb.width, 0);
-			dctx.scale(-1, 1);
-			dctx.drawImage(this.srcImgCanvas,
-					bb.width/2+bb.left, 0,
-					bb.width/2, this.srcImg.height,
-					-bb.width/2, 0,
-					bb.width/2, this.srcImg.height);
-			dctx.restore();
+				dctx.save();
+				dctx.translate(bb.width, 0);
+				dctx.scale(-1, 1);
+				dctx.drawImage(this.srcImgCanvas,
+						bb.width / 2 + bb.left, 0,
+						bb.width / 2, this.srcImg.height,
+						-bb.width / 2, 0,
+						bb.width / 2, this.srcImg.height);
+				dctx.restore();
+			} else {
+				// Left
+				dctx.drawImage(this.srcImgCanvas,
+						bb.left, 0,
+						bb.center, this.srcImg.height,
+						0, 0,
+						bb.center, this.srcImg.height);
+				dctx.save();
+				dctx.translate(bb.width, 0);
+				dctx.scale(-1, 1);
+				dctx.drawImage(this.srcImgCanvas,
+						bb.left, 0,
+						bb.center, this.srcImg.height,
+						bb.width-2*bb.center, 0,
+						bb.center, this.srcImg.height);
+				dctx.restore();
+
+				// Right
+				const tw = bb.right-bb.center;
+				dctx.drawImage(this.srcImgCanvas,
+						bb.center, 0,
+						tw, this.srcImg.height,
+						bb.center+bb.width, 0,
+						tw, this.srcImg.height);
+				dctx.save();
+				dctx.translate(bb.width, 0);
+				dctx.scale(-1, 1);
+				dctx.drawImage(this.srcImgCanvas,
+						bb.center, 0,
+						tw, this.srcImg.height,
+						-tw+(bb.width-2*bb.center), 0,
+						tw, this.srcImg.height);
+				dctx.restore();
+			}
 		},
 		drawSourceOverlay () {
 			let ctx = this.srcImgCtx;
@@ -416,7 +497,8 @@ export default {
 
 			ctx.beginPath();
 			ctx.setLineDash([10, 10]);
-			let cx = this.srcImg.bbox.left + (this.srcImg.bbox.width / 2);
+			// let cx = this.srcImg.bbox.left + (this.srcImg.bbox.width / 2);
+			let cx = this.srcImg.bbox.center;
 			ctx.moveTo(cx, 0);
 			ctx.lineTo(cx, this.srcImg.height);
 			ctx.stroke();
@@ -431,8 +513,10 @@ export default {
 							ctx = this.srcImgCtx;
 
 					this.srcImg.bbox.width = (this.srcImg.bbox.right - this.srcImg.bbox.left);
-					this.srcImg.bbox.center = this.srcImg.bbox.width + this.srcImg.bbox.left;
-					this.srcImg.bbox.center = this.srcImg.bbox.left + (this.srcImg.bbox.right / 2);
+					if (this.symmetricalBox) {
+						this.srcImg.bbox.center = this.srcImg.bbox.width + this.srcImg.bbox.left;
+						this.srcImg.bbox.center = this.srcImg.bbox.left + (this.srcImg.bbox.right / 2);
+					}
 
 					canvas.width = this.srcImg.width;
 					canvas.height = this.srcImg.height;
