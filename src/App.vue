@@ -516,6 +516,9 @@ export default {
 					if (this.symmetricalBox) {
 						this.srcImg.bbox.center = this.srcImg.bbox.width + this.srcImg.bbox.left;
 						this.srcImg.bbox.center = this.srcImg.bbox.left + (this.srcImg.bbox.right / 2);
+					} else {
+						// Coerce to integer.  This is done automatically in symmetrical mode because it's calculated
+						this.srcImg.bbox.center = Number(this.srcImg.bbox.center);
 					}
 
 					canvas.width = this.srcImg.width;
