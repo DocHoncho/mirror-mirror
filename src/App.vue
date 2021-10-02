@@ -268,7 +268,7 @@ export default {
 			saveCompression: 75,
 			isDragging: false,
 			isFileDragging: false,
-			symmetricalBox: false,
+			symmetricalBox: true,
 			srcImg: {
 				bbox: {
 					left: 0,
@@ -349,7 +349,7 @@ export default {
 				this.srcImg.bbox.right = bmp.width;
 				this.srcImg.bbox.top = 0;
 				this.srcImg.bbox.bottom = bmp.height;
-				this.srcImg.bbox.center = bmp.width / 3;
+				this.srcImg.bbox.center = bmp.width / 2;
 				this.srcImg.rotation = 0;
 				this.srcImg.translate = this.srcImg.width / 2;
 
