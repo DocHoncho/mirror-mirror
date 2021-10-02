@@ -71,6 +71,7 @@
 							<v-switch
 									v-model="symmetricalBox"
 									:label="boxModeLabel"
+									v-on:change="modeSwitch"
 							/>
 							<div
 									v-if="symmetricalBox"
@@ -503,6 +504,13 @@ export default {
 			ctx.lineTo(cx, this.srcImg.height);
 			ctx.stroke();
 
+		},
+		modeSwitch () {
+				this.srcImg.bbox.left = 0;
+				this.srcImg.bbox.right = this.srcImg.width;
+				this.srcImg.bbox.width = this.srcImg.width;
+				this.srcImg.bbox.center = this.srcImg.width/2;
+				this.update();
 		},
 		update () {
 			if (!this.isUpdating) {
